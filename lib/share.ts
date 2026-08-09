@@ -16,6 +16,10 @@ export function buildShareText(state: GameState, stats?: Stats): string {
 /**
  * Clipboard API needs a secure context and can be blocked outright, so fall
  * back to the old execCommand trick before giving up.
+ *
+ * The fallback is not theoretical on mobile: `navigator.clipboard` is absent
+ * on any plain-http origin, which is every phone opening this over a LAN
+ * address, so iOS lands here routinely.
  */
 export async function copyToClipboard(text: string): Promise<boolean> {
   try {
@@ -30,12 +34,28 @@ export async function copyToClipboard(text: string): Promise<boolean> {
   try {
     const area = document.createElement('textarea');
     area.value = text;
-    area.setAttribute('readonly', '');
+    area.readOnly = true;
     area.style.position = 'fixed';
+    area.style.top = '0';
+    area.style.left = '0';
     area.style.opacity = '0';
+    // Anything below 16px makes iOS zoom the page when the field takes focus.
+    area.style.fontSize = '16px';
     document.body.appendChild(area);
+
+    // iOS Safari ignores select() on a readonly textarea and copies nothing;
+    // it only honours a range selected explicitly. Harmless elsewhere.
+    area.contentEditable = 'true';
+    const range = document.createRange();
+    range.selectNodeContents(area);
+    const selection = window.getSelection();
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+    area.setSelectionRange(0, text.length);
     area.select();
+
     const ok = document.execCommand('copy');
+    selection?.removeAllRanges();
     document.body.removeChild(area);
     return ok;
   } catch {

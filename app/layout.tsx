@@ -21,7 +21,20 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {/*
+          The grid is derived from the visitor's local date, so it cannot exist
+          in the pre-rendered HTML - without scripting the page would otherwise
+          sit on "Loading today's grid..." forever with nothing explaining why.
+        */}
+        <noscript>
+          <div className="noscript">
+            <strong>Vowel Movement needs JavaScript.</strong> The daily grid is worked out on your
+            own device from today’s date - there is no server to send one.
+          </div>
+        </noscript>
+        {children}
+      </body>
     </html>
   );
 }
