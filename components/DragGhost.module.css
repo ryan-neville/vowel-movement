@@ -1,0 +1,21 @@
+/* Follows the pointer during a drag. Never a hit-test target, otherwise it
+   would shadow the cell underneath when we ask what is at the cursor. */
+.ghost {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 12px;
+  background: var(--token-bg);
+  color: var(--token-ink);
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+  box-shadow: var(--shadow);
+}

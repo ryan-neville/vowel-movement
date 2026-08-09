@@ -1,0 +1,124 @@
+.board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) 0.34fr;
+  grid-template-rows: repeat(4, 1fr) 0.34fr;
+  gap: clamp(5px, 1.6vw, 9px);
+  width: min(100%, 25rem);
+  margin-inline: auto;
+  touch-action: manipulation;
+}
+
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  margin: 0;
+  padding: 0;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  color: var(--ink);
+  font-size: clamp(1.35rem, 7.5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  transition: background-color 140ms ease, border-color 140ms ease, transform 120ms ease;
+}
+
+/* Given consonants: visibly part of the furniture, and not a drop target. */
+.locked {
+  border-color: transparent;
+  background: var(--locked-bg);
+  color: var(--locked-ink);
+  cursor: default;
+}
+
+.blank {
+  border-style: dashed;
+  border-color: var(--line-strong);
+  background: var(--bg-sunken);
+  touch-action: none;
+}
+
+.filled {
+  border-style: solid;
+  border-color: var(--line-strong);
+  background: var(--bg-panel);
+  cursor: grab;
+  touch-action: none;
+}
+
+.filled:active {
+  cursor: grabbing;
+}
+
+/* Tints reflect the two lines a cell belongs to. */
+.half {
+  border-color: color-mix(in srgb, var(--valid) 45%, var(--line-strong));
+  background: color-mix(in srgb, var(--valid-soft) 55%, var(--bg-panel));
+}
+
+.valid {
+  border-color: var(--valid);
+  background: var(--valid-soft);
+}
+
+.invalid {
+  border-color: var(--invalid);
+  background: var(--invalid-soft);
+}
+
+/* Keep given consonants borderless even when their line is judged, so the
+   vowels the player placed stay distinguishable inside a green or red word. */
+.locked.half,
+.locked.valid,
+.locked.invalid {
+  border-color: transparent;
+}
+
+.droppable {
+  border-color: var(--accent);
+  border-style: solid;
+  background: var(--accent-soft);
+  transform: scale(1.04);
+}
+
+.lifted {
+  opacity: 0.35;
+}
+
+.selectable {
+  cursor: pointer;
+}
+
+/* Row and column verdict pills that sit in the board's outer track. */
+.flag {
+  align-self: center;
+  justify-self: center;
+  border-radius: 999px;
+  background: var(--line);
+  transition: background-color 160ms ease;
+}
+
+.flagRow {
+  width: 6px;
+  height: 55%;
+}
+
+.flagColumn {
+  width: 55%;
+  height: 6px;
+}
+
+.flagValid {
+  background: var(--valid);
+}
+
+.flagInvalid {
+  background: var(--invalid);
+}
+
+.flagPartial {
+  background: var(--line-strong);
+}
