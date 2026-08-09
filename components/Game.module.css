@@ -1,0 +1,190 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: min(100%, 32rem);
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin-inline: auto;
+  padding: clamp(1rem, 4vw, 2rem) clamp(0.9rem, 4vw, 1.5rem) 3rem;
+  /* viewport-fit=cover puts the page under the notch and the home indicator;
+     keep the board clear of both. Engines without env() keep the shorthand. */
+  padding-right: max(clamp(0.9rem, 4vw, 1.5rem), env(safe-area-inset-right, 0px));
+  padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
+  padding-left: max(clamp(0.9rem, 4vw, 1.5rem), env(safe-area-inset-left, 0px));
+}
+
+.header {
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.6rem, 8vw, 2.2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.status {
+  min-height: 1.5rem;
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.92rem;
+  text-align: center;
+}
+
+.statusWin {
+  color: var(--valid);
+  font-weight: 600;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.button {
+  /* 44px floor: the minimum comfortable touch target. */
+  min-height: 44px;
+  padding: 0.55rem 1.1rem;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--bg-panel);
+  font-size: 0.9rem;
+  font-weight: 600;
+  touch-action: manipulation;
+  transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+/* Hover only where a pointer can actually hover - iOS Safari leaves :hover
+   stuck on after a tap - and an :active twin for the touch equivalent. */
+@media (hover: hover) {
+  .button:hover:not(:disabled) {
+    border-color: var(--ink-muted);
+  }
+
+  .primary:hover:not(:disabled) {
+    border-color: transparent;
+    filter: brightness(1.05);
+  }
+}
+
+.button:active:not(:disabled) {
+  background: var(--bg-sunken);
+  border-color: var(--ink-muted);
+}
+
+.button:disabled {
+  color: var(--ink-faint);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.primary {
+  border-color: transparent;
+  background: var(--valid);
+  color: #06210f;
+}
+
+.primary:active:not(:disabled) {
+  border-color: transparent;
+  background: var(--valid);
+  filter: brightness(0.92);
+}
+
+.win {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border: 1.5px solid var(--valid);
+  border-radius: 16px;
+  background: var(--valid-soft);
+  text-align: center;
+}
+
+.winTitle {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.winLine {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}
+
+.help {
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  padding: 0.35rem 1rem;
+}
+
+/* `list-style: none` hides the marker in Firefox; WebKit and Blink need the
+   pseudo-element below. Deliberately not changing `display` - Safari has a
+   long history of breaking the toggle when summary stops being a list-item. */
+.helpSummary {
+  /* Padding rather than min-height: keeps the 44px target without touching
+     the display type. */
+  padding: 0.75rem 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  touch-action: manipulation;
+}
+
+.helpSummary::-webkit-details-marker {
+  display: none;
+}
+
+.helpSummary::after {
+  content: ' +';
+  color: var(--ink-faint);
+}
+
+.help[open] .helpSummary::after {
+  content: ' −';
+}
+
+.helpBody {
+  color: var(--ink-muted);
+  font-size: 0.88rem;
+}
+
+.helpBody ul {
+  margin: 0 0 0.75rem;
+  padding-left: 1.1rem;
+}
+
+.helpBody li {
+  margin-bottom: 0.35rem;
+}
+
+.footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  color: var(--ink-faint);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.skeleton {
+  width: min(100%, 25rem);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  border-radius: 16px;
+  background: var(--bg-sunken);
+}
