@@ -1,0 +1,31 @@
+{
+  "name": "vowel-movement",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A daily 4x4 word-square puzzle: drag a limited bank of vowels into the blanks to form 4 across and 4 down.",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "dev:lan": "next dev -H 0.0.0.0",
+    "build": "next build",
+    "preview": "node scripts/preview.mjs",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import ./scripts/register-alias.mjs --test \"tests/*.test.ts\"",
+    "generate:puzzles": "node scripts/generate-puzzles.mjs",
+    "verify:puzzles": "node scripts/verify-puzzles.mjs"
+  },
+  "dependencies": {
+    "next": "^16.3.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "typescript": "^7.0.2",
+    "word-list": "^4.1.0",
+    "wordlist-english": "^1.2.1"
+  }
+}

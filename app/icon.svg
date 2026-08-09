@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Vowel Movement">
+  <rect width="64" height="64" rx="14" fill="#1b1d22" />
+  <g fill="none" stroke="#4c515c" stroke-width="3" stroke-linecap="round">
+    <path d="M14 26h36M14 38h36M26 14v36M38 14v36" />
+  </g>
+  <g fill="#f0efec" font-family="system-ui, sans-serif" font-size="15" font-weight="700" text-anchor="middle">
+    <text x="20" y="25">V</text>
+    <text x="44" y="49">L</text>
+  </g>
+  <circle cx="44" cy="20" r="6" fill="#4ade80" />
+  <circle cx="20" cy="44" r="6" fill="#4ade80" />
+</svg>
