@@ -1,0 +1,113 @@
+/* Design tokens. Light is the base palette; dark redefines only the values. */
+:root {
+  --bg: #f4f2ee;
+  --bg-panel: #ffffff;
+  --bg-sunken: #eceae4;
+  --ink: #1b1d22;
+  --ink-muted: #6b6f7a;
+  --ink-faint: #9aa0ab;
+  --line: #d9d5cc;
+  --line-strong: #bfb9ac;
+
+  --locked-bg: #e4e0d6;
+  --locked-ink: #3b3f47;
+  --token-bg: #2f3540;
+  --token-ink: #fbfaf7;
+
+  --valid: #1f9d55;
+  --valid-soft: #d9f2e3;
+  --invalid: #d1483c;
+  --invalid-soft: #fadedb;
+  --accent: #b4531f;
+  --accent-soft: #fbe6d6;
+
+  --radius: 12px;
+  --shadow: 0 1px 2px rgb(27 29 34 / 8%), 0 8px 24px rgb(27 29 34 / 6%);
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14161b;
+    --bg-panel: #1c1f26;
+    --bg-sunken: #101216;
+    --ink: #f0efec;
+    --ink-muted: #a2a8b4;
+    --ink-faint: #6f7681;
+    --line: #2b2f38;
+    --line-strong: #3b414d;
+
+    --locked-bg: #2a2e37;
+    --locked-ink: #e8e6e1;
+    --token-bg: #f0efec;
+    --token-ink: #1b1d22;
+
+    --valid: #4ade80;
+    --valid-soft: #12301f;
+    --invalid: #f87171;
+    --invalid-soft: #38181a;
+    --accent: #f0a06a;
+    --accent-soft: #3a2617;
+
+    --shadow: 0 1px 2px rgb(0 0 0 / 40%), 0 12px 32px rgb(0 0 0 / 28%);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

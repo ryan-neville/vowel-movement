@@ -1,0 +1,81 @@
+.bank {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.tokens {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: clamp(5px, 1.6vw, 9px);
+  width: min(100%, 25rem);
+}
+
+.token {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  margin: 0;
+  padding: 0;
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  background: var(--token-bg);
+  color: var(--token-ink);
+  font-size: clamp(1.2rem, 6vw, 1.65rem);
+  font-weight: 700;
+  line-height: 1;
+  touch-action: none;
+  transition: transform 120ms ease, opacity 140ms ease, box-shadow 140ms ease;
+}
+
+.token:active {
+  cursor: grabbing;
+}
+
+/* Armed by tap: the next empty cell you touch receives this vowel. */
+.armed {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  transform: translateY(-3px);
+}
+
+.spent {
+  background: var(--bg-sunken);
+  color: var(--ink-faint);
+  border-color: var(--line);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.count {
+  position: absolute;
+  top: -0.4rem;
+  right: -0.4rem;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  display: grid;
+  place-items: center;
+  padding: 0 0.25rem;
+  border: 2px solid var(--bg);
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.spent .count {
+  background: var(--line-strong);
+  color: var(--bg-panel);
+}
+
+.caption {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
