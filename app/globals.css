@@ -66,7 +66,16 @@ body {
   padding: 0;
 }
 
+html {
+  /* iOS Safari inflates body text in landscape unless this is pinned. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
+  /* 100vh first: mobile Safari measures it against the expanded toolbar, so it
+     is only the floor. dvh wins wherever it is understood. */
+  min-height: 100vh;
   min-height: 100dvh;
   background: var(--bg);
   color: var(--ink);
@@ -83,6 +92,20 @@ button {
   font: inherit;
   color: inherit;
   cursor: pointer;
+  /* Suppresses the iOS double-tap-zoom delay on everything clickable. */
+  touch-action: manipulation;
+}
+
+.noscript {
+  margin: 0 auto;
+  max-width: 32rem;
+  padding: 1rem;
+  border: 1.5px solid var(--accent);
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-size: 0.95rem;
+  text-align: center;
 }
 
 :focus-visible {

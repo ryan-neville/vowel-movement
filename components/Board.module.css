@@ -23,6 +23,11 @@
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1;
+  /* Holding a cell to drag it is a long press to iOS, which would otherwise
+     select the letter and raise the copy/lookup callout mid-gesture. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
   transition: background-color 140ms ease, border-color 140ms ease, transform 120ms ease;
 }
 
@@ -53,8 +58,11 @@
   cursor: grabbing;
 }
 
-/* Tints reflect the two lines a cell belongs to. */
+/* Tints reflect the two lines a cell belongs to. The plain pair comes first so
+   engines without color-mix() still tell "one line done" apart from "both". */
 .half {
+  border-color: var(--line-strong);
+  background: var(--valid-soft);
   border-color: color-mix(in srgb, var(--valid) 45%, var(--line-strong));
   background: color-mix(in srgb, var(--valid-soft) 55%, var(--bg-panel));
 }

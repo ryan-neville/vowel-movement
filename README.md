@@ -28,11 +28,32 @@ npm run dev          # http://localhost:3000
 | Script                     | What it does                                                     |
 | -------------------------- | ---------------------------------------------------------------- |
 | `npm run dev`              | Development server                                                |
+| `npm run dev:lan`          | Development server, reachable from other devices on the network   |
 | `npm run build`            | Static export to `out/` — plain HTML/CSS/JS, no server needed     |
+| `npm run preview`          | Serves the built `out/` over the LAN for testing on a real phone  |
 | `npm test`                 | Game-logic tests (Node's built-in runner, no build step)          |
 | `npm run typecheck`        | `tsc --noEmit`                                                    |
 | `npm run generate:puzzles` | Rebuilds `data/puzzles.json` and `data/words4.json` from scratch  |
 | `npm run verify:puzzles`   | Re-solves every shipped puzzle against the shipped dictionary     |
+
+### Testing on a phone
+
+```bash
+npm run dev:lan               # then open http://<your-lan-ip>:3000 on the phone
+npm run build && npm run preview   # or test the real static build
+```
+
+Both scripts print the LAN address to use. Two things make this fail in ways that look like a bug
+in the game, so they are handled rather than left to be rediscovered:
+
+- **The dev server rejects cross-origin requests for `/_next/*`.** Next serves the React and
+  application chunks with `crossorigin`, so the browser sends an `Origin` header, and only
+  `localhost` is trusted by default. Stylesheets carry no `crossorigin` and are served normally, so
+  a phone gets a fully styled page that never hydrates — a permanent *"Loading today's grid…"* with
+  nothing in the UI to explain it. `allowedDevOrigins` in [next.config.mjs](next.config.mjs) picks
+  up this machine's own LAN addresses at startup; `NEXT_DEV_ORIGINS` adds anything else.
+- **Ad-hoc static servers mislabel `.js`.** WebKit refuses to execute a script served as
+  `text/plain`, which on Windows is a common default. `scripts/preview.mjs` sets the types itself.
 
 ## How it works
 
@@ -51,7 +72,9 @@ date, so every device derives the same grid independently.
   the board on restore, so the two can never drift apart.
 
 Because the grid depends on the visitor's clock, the board renders only after mount — the
-pre-rendered HTML cannot know what day it is where you are.
+pre-rendered HTML cannot know what day it is where you are. That makes scripting a hard
+requirement, so [app/layout.tsx](app/layout.tsx) carries a `<noscript>` saying so instead of
+leaving the loading line up forever.
 
 ### The puzzle data
 

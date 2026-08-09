@@ -28,11 +28,19 @@
   font-weight: 700;
   line-height: 1;
   touch-action: none;
+  /* Same reason as the board cells: a drag reads as a long press on iOS. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
   transition: transform 120ms ease, opacity 140ms ease, box-shadow 140ms ease;
 }
 
-.token:active {
+/* Touch has no cursor, so the press needs a visible acknowledgement of its own.
+   Opacity keeps it on the compositor and the reduced-motion override already
+   collapses the transition to nothing. */
+.token:active:not(:disabled) {
   cursor: grabbing;
+  opacity: 0.75;
 }
 
 /* Armed by tap: the next empty cell you touch receives this vowel. */
