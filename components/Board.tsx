@@ -2,13 +2,7 @@
 
 import type { KeyboardEvent, PointerEvent as ReactPointerEvent } from 'react';
 import styles from '@/components/Board.module.css';
-import {
-  GRID_SIZE,
-  cellIndex,
-  type BoardEvaluation,
-  type GameState,
-  type LineStatus,
-} from '@/lib/game';
+import { cellIndex, type BoardEvaluation, type GameState, type LineStatus } from '@/lib/game';
 import { sourceLetter, type DragState } from '@/hooks/useVowelDrag';
 
 interface DragHandlers {
@@ -46,9 +40,13 @@ function flagClass(status: LineStatus): string {
 const ordinal = (n: number) => `${n + 1}`;
 
 /**
- * The 4x4 grid plus an outer track of verdict pills - one to the right of each
- * row, one below each column. Screen readers get the same information from the
- * live summary in the page, so the pills themselves are decorative.
+ * The grid plus an outer track of verdict pills - one to the right of each row,
+ * one below each column. Screen readers get the same information from the live
+ * summary in the page, so the pills themselves are decorative.
+ *
+ * The track counts are the one thing that has to be an inline style: they change
+ * with the board size, and `repeat()` is the corner of grid where a `var()` for
+ * the repetition count is not dependable across engines.
  */
 export function Board({
   state,
@@ -59,19 +57,24 @@ export function Board({
   dragHandlers,
   onCellKeyDown,
 }: BoardProps) {
+  const { size } = state;
   const draggingFrom = drag?.active && drag.source.kind === 'cell' ? drag.source.index : null;
   // A gesture that began on an empty cell carries no token, so it lights nothing up.
   const dropTarget = drag?.active && sourceLetter(drag.source) ? drag.over : null;
+  const tracks = `repeat(${size}, 1fr) var(--flag-track)`;
 
   return (
-    <div className={styles.board}>
-      {Array.from({ length: GRID_SIZE }, (_, row) => {
+    <div
+      className={styles.board}
+      style={{ gridTemplateColumns: tracks, gridTemplateRows: tracks }}
+    >
+      {Array.from({ length: size }, (_, row) => {
         const rowLine = evaluation.rows[row];
 
         return (
           <div key={row} style={{ display: 'contents' }}>
-            {Array.from({ length: GRID_SIZE }, (_, column) => {
-              const index = cellIndex(row, column);
+            {Array.from({ length: size }, (_, column) => {
+              const index = cellIndex(row, column, size);
               const consonant = state.consonantGrid[index];
               const vowel = state.playerGrid[index];
               const tint = cellTint(rowLine.status, evaluation.columns[column].status);

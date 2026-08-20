@@ -4,7 +4,7 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Vowel Movement',
   description:
-    'A daily 4x4 word square. Drag the day&apos;s eight vowels into the blanks to spell four words across and four words down.',
+    'A daily word square in four sizes - 4x4, 5x5, 6x6 and 7x7. Drag the day&apos;s bank of vowels into the blanks to spell every row and every column.',
   applicationName: 'Vowel Movement',
 };
 

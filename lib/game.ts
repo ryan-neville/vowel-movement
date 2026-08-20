@@ -3,19 +3,24 @@ import {
   emptyVowelCounts,
   isVowel,
   type DailyPuzzle,
+  type PuzzleSize,
   type Vowel,
   type VowelCounts,
 } from '@/lib/puzzle';
 
-export const GRID_SIZE = 4;
-export const CELL_COUNT = GRID_SIZE * GRID_SIZE;
+/** Cells on a size x size board. */
+export const cellCount = (size: PuzzleSize): number => size * size;
+
+/** Rows plus columns - every line the board is judged on. */
+export const lineCount = (size: PuzzleSize): number => size * 2;
 
 export interface GameState {
   puzzleId: string;
   puzzleNumber: number;
-  /** Length 16, '' where the player must place a vowel. */
+  size: PuzzleSize;
+  /** Length size x size, '' where the player must place a vowel. */
   consonantGrid: string[];
-  /** Length 16, '' except where the player has placed a vowel. */
+  /** Length size x size, '' except where the player has placed a vowel. */
   playerGrid: string[];
   /** The day's bank as dealt. */
   initialVowels: VowelCounts;
@@ -44,10 +49,26 @@ export function createGameState(puzzle: DailyPuzzle): GameState {
   return {
     puzzleId: puzzle.puzzleId,
     puzzleNumber: puzzle.puzzleNumber,
+    size: puzzle.size,
     consonantGrid: [...puzzle.consonantGrid],
-    playerGrid: Array<string>(CELL_COUNT).fill(''),
+    playerGrid: Array<string>(cellCount(puzzle.size)).fill(''),
     initialVowels: { ...puzzle.initialVowels },
     currentVowels: { ...puzzle.initialVowels },
+    placements: 0,
+    isWon: false,
+  };
+}
+
+/** An unplayable board of the right shape, for before the dataset has loaded. */
+export function emptyGameState(size: PuzzleSize): GameState {
+  return {
+    puzzleId: '',
+    puzzleNumber: 0,
+    size,
+    consonantGrid: Array<string>(cellCount(size)).fill(''),
+    playerGrid: Array<string>(cellCount(size)).fill(''),
+    initialVowels: emptyVowelCounts(),
+    currentVowels: emptyVowelCounts(),
     placements: 0,
     isWon: false,
   };
@@ -58,34 +79,38 @@ export function mergedGrid(state: GameState): string[] {
   return state.consonantGrid.map((consonant, i) => consonant || state.playerGrid[i]);
 }
 
-export const cellIndex = (row: number, column: number) => row * GRID_SIZE + column;
-export const rowOf = (index: number) => Math.floor(index / GRID_SIZE);
-export const columnOf = (index: number) => index % GRID_SIZE;
+export const cellIndex = (row: number, column: number, size: PuzzleSize) => row * size + column;
+export const rowOf = (index: number, size: PuzzleSize) => Math.floor(index / size);
+export const columnOf = (index: number, size: PuzzleSize) => index % size;
 
 /** A cell is playable when the puzzle left it blank. */
 export const isBlankCell = (state: GameState, index: number) => state.consonantGrid[index] === '';
 
-function evaluateLine(letters: string[]): LineResult {
+function evaluateLine(letters: string[], size: PuzzleSize): LineResult {
   const filled = letters.filter(Boolean).length;
   const word = letters.join('');
   if (filled === 0) return { status: 'empty', word: '' };
-  if (filled < GRID_SIZE) return { status: 'partial', word };
+  if (filled < size) return { status: 'partial', word };
   return { status: isWord(word) ? 'valid' : 'invalid', word };
 }
 
 /**
- * Re-scores all 8 lines. Cheap enough (8 Set lookups) to run on every drop,
+ * Re-scores every line. Cheap enough (2N Set lookups) to run on every drop,
  * which is what gives the board its instant red/green feedback.
  */
 export function evaluateBoard(state: GameState): BoardEvaluation {
+  const { size } = state;
   const grid = mergedGrid(state);
   const rows: LineResult[] = [];
   const columns: LineResult[] = [];
 
-  for (let i = 0; i < GRID_SIZE; i++) {
-    rows.push(evaluateLine(grid.slice(i * GRID_SIZE, i * GRID_SIZE + GRID_SIZE)));
+  for (let i = 0; i < size; i++) {
+    rows.push(evaluateLine(grid.slice(i * size, i * size + size), size));
     columns.push(
-      evaluateLine(Array.from({ length: GRID_SIZE }, (_, r) => grid[cellIndex(r, i)]))
+      evaluateLine(
+        Array.from({ length: size }, (_, r) => grid[cellIndex(r, i, size)]),
+        size
+      )
     );
   }
 
@@ -161,7 +186,7 @@ export function moveVowel(state: GameState, from: number, to: number): GameState
 export function resetBoard(state: GameState): GameState {
   return {
     ...state,
-    playerGrid: Array<string>(CELL_COUNT).fill(''),
+    playerGrid: Array<string>(cellCount(state.size)).fill(''),
     currentVowels: { ...state.initialVowels },
     placements: 0,
     isWon: false,
