@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  width: min(100%, 32rem);
+  /* Grows with the board so a 7x7 is not the thing being clamped. */
+  width: min(100%, var(--page-width, 32rem));
   min-height: 100vh;
   min-height: 100dvh;
   margin-inline: auto;
@@ -182,9 +183,82 @@
 }
 
 .skeleton {
-  width: min(100%, 25rem);
+  width: min(100%, var(--board-width, 25rem));
   aspect-ratio: 1;
   margin-inline: auto;
   border-radius: 16px;
   background: var(--bg-sunken);
+}
+
+.error {
+  margin: 0;
+  padding: 1rem;
+  border: 1.5px solid var(--invalid);
+  border-radius: var(--radius);
+  background: var(--invalid-soft);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Board size picker: real radios, so arrow keys and screen readers work without
+   a hand-rolled roving tabindex. The inputs are visually hidden inside their
+   labels, which is why the focus ring hangs off :focus-within. */
+.sizes {
+  display: flex;
+  justify-content: center;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.3rem;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  background: var(--bg-panel);
+  align-self: center;
+}
+
+.sizeOption {
+  display: grid;
+  place-items: center;
+  /* 44px floor: the minimum comfortable touch target. */
+  min-width: 3.4rem;
+  min-height: 44px;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.sizeOption:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .sizeOption:hover {
+    color: var(--ink);
+    background: var(--bg-sunken);
+  }
+}
+
+.sizeOption:active {
+  background: var(--bg-sunken);
+}
+
+.sizeActive,
+.sizeActive:active {
+  background: var(--token-bg);
+  color: var(--token-ink);
+}
+
+@media (hover: hover) {
+  .sizeActive:hover {
+    background: var(--token-bg);
+    color: var(--token-ink);
+  }
 }

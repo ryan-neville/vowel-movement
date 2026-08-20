@@ -1,13 +1,20 @@
-import { CELL_COUNT, isConsistent, recountVowels, type GameState } from '@/lib/game';
-import type { DailyPuzzle } from '@/lib/puzzle';
+import { cellCount, isConsistent, recountVowels, type GameState } from '@/lib/game';
+import { isPuzzleSize, type DailyPuzzle, type PuzzleSize } from '@/lib/puzzle';
 
-const STORAGE_VERSION = 1;
-const progressKey = (puzzleId: string) => `vowel-movement:v${STORAGE_VERSION}:board:${puzzleId}`;
-const STATS_KEY = `vowel-movement:v${STORAGE_VERSION}:stats`;
+/**
+ * v2 partitions everything by board size. The bump also retires v1 saves, whose
+ * boards were written against a 4x4 dataset this version no longer ships.
+ */
+const STORAGE_VERSION = 2;
+const NAMESPACE = `vowel-movement:v${STORAGE_VERSION}`;
+const progressKey = (size: PuzzleSize, puzzleId: string) => `${NAMESPACE}:board:${size}:${puzzleId}`;
+const statsKey = (size: PuzzleSize) => `${NAMESPACE}:stats:${size}`;
+const SIZE_KEY = `${NAMESPACE}:size`;
 
 /** Only the player's own moves are persisted; the puzzle itself is regenerated. */
 interface SavedBoard {
   puzzleId: string;
+  size: PuzzleSize;
   playerGrid: string[];
   placements: number;
   isWon: boolean;
@@ -50,11 +57,12 @@ function writeJson(key: string, value: unknown): void {
 export function saveProgress(state: GameState): void {
   const payload: SavedBoard = {
     puzzleId: state.puzzleId,
+    size: state.size,
     playerGrid: state.playerGrid,
     placements: state.placements,
     isWon: state.isWon,
   };
-  writeJson(progressKey(state.puzzleId), payload);
+  writeJson(progressKey(state.size, state.puzzleId), payload);
 }
 
 /**
@@ -63,9 +71,11 @@ export function saveProgress(state: GameState): void {
  * trusted, and the bank is recomputed from the board so the two cannot drift.
  */
 export function loadProgress(fresh: GameState, puzzle: DailyPuzzle): GameState {
-  const saved = readJson<SavedBoard>(progressKey(puzzle.puzzleId));
-  if (!saved || saved.puzzleId !== puzzle.puzzleId) return fresh;
-  if (!Array.isArray(saved.playerGrid) || saved.playerGrid.length !== CELL_COUNT) return fresh;
+  const saved = readJson<SavedBoard>(progressKey(puzzle.size, puzzle.puzzleId));
+  if (!saved || saved.puzzleId !== puzzle.puzzleId || saved.size !== puzzle.size) return fresh;
+  if (!Array.isArray(saved.playerGrid) || saved.playerGrid.length !== cellCount(puzzle.size)) {
+    return fresh;
+  }
 
   const playerGrid = saved.playerGrid.map((letter, i) =>
     typeof letter === 'string' && puzzle.consonantGrid[i] === '' ? letter.toUpperCase() : ''
@@ -81,11 +91,14 @@ export function loadProgress(fresh: GameState, puzzle: DailyPuzzle): GameState {
   return { ...restored, currentVowels: recountVowels(restored), isWon: Boolean(saved.isWon) };
 }
 
-export const loadStats = (): Stats => readJson<Stats>(STATS_KEY) ?? emptyStats();
+export const loadStats = (size: PuzzleSize): Stats => readJson<Stats>(statsKey(size)) ?? emptyStats();
 
-/** Record a win once per puzzle; consecutive puzzle numbers extend the streak. */
-export function recordWin(puzzleNumber: number): Stats {
-  const stats = loadStats();
+/**
+ * Record a win once per puzzle; consecutive puzzle numbers extend the streak.
+ * Streaks are per size - playing 5x5 today does not break a 4x4 run.
+ */
+export function recordWin(size: PuzzleSize, puzzleNumber: number): Stats {
+  const stats = loadStats(size);
   if (stats.lastWinNumber === puzzleNumber) return stats;
 
   const currentStreak = stats.lastWinNumber === puzzleNumber - 1 ? stats.currentStreak + 1 : 1;
@@ -95,6 +108,14 @@ export function recordWin(puzzleNumber: number): Stats {
     maxStreak: Math.max(stats.maxStreak, currentStreak),
     lastWinNumber: puzzleNumber,
   };
-  writeJson(STATS_KEY, next);
+  writeJson(statsKey(size), next);
   return next;
 }
+
+/** The size the player last chose, so the app reopens where they left off. */
+export function loadPreferredSize(): PuzzleSize | null {
+  const saved = readJson<unknown>(SIZE_KEY);
+  return isPuzzleSize(saved) ? saved : null;
+}
+
+export const savePreferredSize = (size: PuzzleSize): void => writeJson(SIZE_KEY, size);

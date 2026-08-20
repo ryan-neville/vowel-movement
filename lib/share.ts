@@ -1,14 +1,23 @@
-import { GRID_SIZE, type GameState } from '@/lib/game';
+import type { GameState } from '@/lib/game';
 import type { Stats } from '@/lib/storage';
 
+/** How the board is named everywhere the player sees it: "5×5". */
+export const sizeLabel = (size: number): string => `${size}×${size}`;
+
 /**
- * The classic spoiler-free brag: a solid green grid proves you closed all four
- * rows and all four columns, and the placement count is the only thing worth
- * competing over in a puzzle with no fail state.
+ * The classic spoiler-free brag: a solid green grid proves you closed every row
+ * and every column, and the placement count is the only thing worth competing
+ * over in a puzzle with no fail state.
  */
 export function buildShareText(state: GameState, stats?: Stats): string {
-  const grid = Array.from({ length: GRID_SIZE }, () => '🟩'.repeat(GRID_SIZE)).join('\n');
-  const lines = [`Vowel Movement #${state.puzzleNumber}`, '', grid, '', `Placements: ${state.placements}`];
+  const grid = Array.from({ length: state.size }, () => '🟩'.repeat(state.size)).join('\n');
+  const lines = [
+    `Vowel Movement ${sizeLabel(state.size)} #${state.puzzleNumber}`,
+    '',
+    grid,
+    '',
+    `Placements: ${state.placements}`,
+  ];
   if (stats && stats.currentStreak > 1) lines.push(`Streak: ${stats.currentStreak}`);
   return lines.join('\n');
 }
